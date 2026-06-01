@@ -9,8 +9,8 @@
     "dev":        "nodemon server.js",
     "migrate":    "knex migrate:latest",
     "migrate:rollback": "knex migrate:rollback",
-    "seed":       "knex seed:run",
-    "seed:local": "node data/seed.local.js",
+    "seed":       "node data/seed.local.js",
+    "seed:postgres": "knex seed:run",
     "test":       "jest --runInBand --forceExit"
   },
   "dependencies": {
