@@ -1,0 +1,35 @@
+# docker-compose.yml — chạy toàn bộ stack với 1 lệnh
+version: '3.9'
+
+services:
+  backend:
+    build: ./backend
+    container_name: caphe_backend
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - JWT_SECRET=change_this_to_a_strong_secret_in_production
+      - FRONTEND_URL=http://localhost
+    volumes:
+      - db_data:/app/data   # persist SQLite DB
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    build: ./frontend
+    container_name: caphe_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  db_data:
