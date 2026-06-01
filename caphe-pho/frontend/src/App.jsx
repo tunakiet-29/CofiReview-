@@ -1,42 +1,49 @@
 // App.jsx — Root: routing, socket, auth, toast
 import { useState, useEffect, useRef } from 'react';
-import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useAuth } from './context/AuthContext';
 import HomePage from './pages/HomePage';
 import CafeDetailPage from './pages/CafeDetailPage';
 import AuthModal from './components/AuthModal';
 import Toast from './components/Toast';
+import { Coffee, SignIn, SignOut } from '@phosphor-icons/react';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
 function Header({ onOpenAuth, connected }) {
   const { user, logout } = useAuth();
   return (
-    <header className="bg-brown-dark sticky top-0 z-40 shadow-sm">
-      <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
-        <Link to="/" className="font-display text-lg text-cream hover:opacity-90 transition-opacity whitespace-nowrap">
-          ☕ Cà Phê <span className="text-brown-light">Phố</span>
+    <header className="bg-brown-dark sticky top-0 z-40">
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2.5 group">
+          <Coffee weight="fill" size={26} className="text-accent group-hover:text-brown-light transition-colors" />
+          <span className="font-display text-xl font-bold text-cream tracking-tight">
+            Cà Phê <span className="text-accent">Phố</span>
+          </span>
         </Link>
 
-        <div className="flex items-center gap-2">
-          {/* Socket status */}
-          <span className={`w-2 h-2 rounded-full flex-shrink-0 transition-colors ${connected ? 'bg-green-400' : 'bg-gray-500'}`}
-            title={connected ? 'Realtime đang hoạt động' : 'Mất kết nối realtime'} />
+        {/* Right actions */}
+        <div className="flex items-center gap-3">
 
           {user ? (
-            <div className="flex items-center gap-2">
-              <span className="text-cream/80 text-sm hidden sm:block truncate max-w-[120px]">{user.name}</span>
+            <div className="flex items-center gap-3">
+              <span className="text-cream/70 text-sm hidden sm:block">
+                Xin chào, <span className="text-cream font-semibold">{user.name}</span>
+              </span>
               <button onClick={logout}
-                className="text-xs border border-white/30 text-cream/80 px-3 py-1.5 rounded-full
-                           hover:border-white hover:text-white transition-all">
-                Đăng xuất
+                className="flex items-center gap-1.5 text-sm border border-white/20 text-cream/80 px-4 py-2 rounded-full
+                           hover:border-white/50 hover:text-white transition-all active:scale-[0.97]">
+                <SignOut size={16} />
+                <span className="hidden sm:block">Đăng xuất</span>
               </button>
             </div>
           ) : (
             <button onClick={onOpenAuth}
-              className="text-xs bg-accent text-white px-4 py-1.5 rounded-full
-                         hover:bg-brown-light transition-colors font-medium">
+              className="flex items-center gap-2 bg-accent text-white text-sm font-semibold px-5 py-2 rounded-full
+                         hover:bg-brown-light transition-all active:scale-[0.97]">
+              <SignIn size={16} />
               Đăng nhập
             </button>
           )}
@@ -86,17 +93,22 @@ export default function App() {
             <CafeDetailPage socket={socket} onNeedAuth={() => setShowAuth(true)} />
           } />
           <Route path="*" element={
-            <div className="text-center py-20 text-muted">
-              <div className="text-5xl mb-3">☕</div>
-              <p>Trang không tồn tại</p>
-              <Link to="/" className="text-accent text-sm hover:underline mt-2 block">Về trang chủ</Link>
+            <div className="text-center py-24 text-muted">
+              <Coffee size={64} weight="light" className="mx-auto mb-4 opacity-40" />
+              <p className="text-xl font-semibold text-brown-dark mb-2">Trang không tồn tại</p>
+              <Link to="/" className="text-accent text-sm font-medium hover:underline mt-2 block">Về trang chủ</Link>
             </div>
           } />
         </Routes>
       </main>
 
-      <footer className="py-5 border-t border-border text-center text-xs text-muted">
-        Cà Phê Phố v2 — React + Express + SQLite + Socket.IO
+      <footer className="py-8 border-t border-border">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-center">
+          <div className="flex items-center gap-2">
+            <Coffee weight="fill" size={18} className="text-accent" />
+            <span className="font-display font-bold text-sm text-brown-dark">Cà Phê Phố</span>
+          </div>
+        </div>
       </footer>
 
       {/* Auth Modal */}

@@ -1,40 +1,68 @@
 // components/CafeCard.jsx
 import { Link } from 'react-router-dom';
 import StarRating from './StarRating';
+import { MapPin, Heart } from '@phosphor-icons/react';
 
 export default function CafeCard({ cafe }) {
-  const { id, name, address, tags, emoji, avg_rating, review_count } = cafe;
+  const { id, name, address, tags, avg_rating, review_count } = cafe;
 
   return (
     <Link to={`/cafes/${id}`}
-      className="block bg-card-bg border border-border rounded-2xl p-4 fade-in
-                 hover:border-brown-light hover:shadow-md transition-all duration-200
-                 hover:-translate-y-0.5 group">
-      <div className="flex gap-4">
-        <div className="w-14 h-14 rounded-xl bg-tag-bg flex items-center justify-center
-                        text-3xl flex-shrink-0">{emoji}</div>
-        <div className="flex-1 min-w-0">
-          <h2 className="font-display font-bold text-base truncate
-                         group-hover:text-brown-mid transition-colors">{name}</h2>
-          <p className="text-muted text-xs mt-0.5 truncate">📍 {address}</p>
-          <div className="flex gap-1.5 mt-2 flex-wrap">
-            {(tags || []).map(tag => (
-              <span key={tag} className="text-xs px-2.5 py-0.5 rounded-full bg-tag-bg text-brown-mid font-medium">
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-        <div className="text-right flex-shrink-0 flex flex-col items-end justify-center">
+      className="block bg-card-bg border border-border rounded-2xl overflow-hidden fade-in
+                 hover:border-brown-light hover:shadow-md transition-all duration-300
+                 hover:-translate-y-1 active:scale-[0.98] group relative flex flex-col">
+                 
+      {/* Top Image (Placeholder using Picsum) */}
+      <div className="w-full h-48 bg-tag-bg relative overflow-hidden">
+        <img 
+          src={`https://picsum.photos/seed/${['coffeeshop','latte','cafe','espresso','cappuccino','barista'][id % 6]}-${id}/600/400`} 
+          alt={name} 
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          onError={e => { e.target.src = `https://picsum.photos/seed/coffee${id}/600/400`; }}
+        />
+        {/* Favorite Button (Mock UI for US6) */}
+        <button 
+          onClick={(e) => { e.preventDefault(); /* Mock Toggle Favorite */ }}
+          className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-brown-mid hover:text-accent hover:bg-white transition-colors z-10"
+          aria-label="Lưu quán"
+        >
+          <Heart weight="bold" size={18} />
+        </button>
+      </div>
+
+      <div className="p-5 flex-1 flex flex-col">
+        <div className="flex justify-between items-start gap-3 mb-2">
+          <h2 className="font-display font-bold text-lg leading-tight text-brown-dark group-hover:text-brown-mid transition-colors line-clamp-2">
+            {name}
+          </h2>
           {avg_rating ? (
-            <>
-              <span className="text-xl font-bold text-brown-dark leading-none">{avg_rating}</span>
-              <StarRating value={Math.round(avg_rating)} readOnly size="sm" />
-              <span className="text-xs text-muted mt-1">{review_count} review</span>
-            </>
+            <div className="flex flex-col items-end flex-shrink-0">
+              <div className="flex items-center gap-1 bg-brown-dark text-cream px-2 py-0.5 rounded-lg">
+                <span className="font-bold text-sm leading-none">{avg_rating}</span>
+                <StarRating value={Math.round(avg_rating)} readOnly size="xs" />
+              </div>
+              <span className="text-[10px] text-muted mt-1 uppercase tracking-wide">
+                {review_count} review
+              </span>
+            </div>
           ) : (
-            <span className="text-xs text-muted text-right leading-snug">Chưa có<br/>review</span>
+            <span className="text-xs text-muted text-right bg-tag-bg px-2 py-1 rounded-lg flex-shrink-0">
+              Mới
+            </span>
           )}
+        </div>
+        
+        <p className="text-muted text-sm mt-0.5 flex items-center gap-1.5 truncate">
+          <MapPin weight="fill" className="text-brown-light flex-shrink-0" />
+          <span className="truncate">{address}</span>
+        </p>
+
+        <div className="flex gap-2 mt-auto pt-4 flex-wrap">
+          {(tags || []).map(tag => (
+            <span key={tag} className="text-[11px] px-2.5 py-1 rounded-full bg-tag-bg text-brown-mid font-medium uppercase tracking-wide">
+              {tag}
+            </span>
+          ))}
         </div>
       </div>
     </Link>
