@@ -41,6 +41,8 @@ export const cafeAPI = {
 
 // ── Reviews ─────────────────────────────────────────────────
 export const reviewAPI = {
-  list:   (cafeId)       => api.get(`/cafes/${cafeId}/reviews`).then(r => r.data.data),
-  create: (cafeId, body) => api.post(`/cafes/${cafeId}/reviews`, body).then(r => r.data),
+  list:   (cafeId)                 => api.get(`/cafes/${cafeId}/reviews`).then(r => r.data.data),
+  create: (cafeId, body)           => api.post(`/cafes/${cafeId}/reviews`, body).then(r => r.data),
+  update: (cafeId, reviewId, body) => api.patch(`/cafes/${cafeId}/reviews/${reviewId}`, body).then(r => r.data),
+  remove: (cafeId, reviewId)       => api.delete(`/cafes/${cafeId}/reviews/${reviewId}`).then(r => r.data),
 };

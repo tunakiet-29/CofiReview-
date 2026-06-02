@@ -1,7 +1,12 @@
 // src/routes/reviewRoutes.js
 const express    = require('express');
 const router     = express.Router({ mergeParams: true });
-const { getReviews, createReview } = require('../controllers/reviewController');
+const {
+  getReviews,
+  createReview,
+  updateReview,
+  deleteReview,
+} = require('../controllers/reviewController');
 const { requireAuth } = require('../middleware/auth');
 const rateLimit  = require('express-rate-limit');
 
@@ -79,5 +84,8 @@ router.get('/', getReviews);
  *         description: Gửi quá nhiều review (rate limit)
  */
 router.post('/', requireAuth, reviewLimiter, createReview);
+
+router.patch('/:reviewId', requireAuth, updateReview);
+router.delete('/:reviewId', requireAuth, deleteReview);
 
 module.exports = router;

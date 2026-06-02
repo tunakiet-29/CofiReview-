@@ -50,16 +50,35 @@ export default function CafeDetailPage({ socket, onNeedAuth }) {
     return () => { socket.emit('leave_cafe', id); socket.off('new_review', handleNewReview); };
   }, [socket, id]);
 
-  const handleReviewAdded = (review) => {
-    setReviews(prev => [review, ...prev]);
+  const applyCafeStats = (stats) => {
+    if (!stats) return;
+    setCafe(prev => prev ? {
+      ...prev,
+      avg_rating: stats.avg_rating,
+      review_count: stats.review_count,
+    } : prev);
+  };
+
+  const handleReviewAdded = (review, stats) => {
+    setReviews(prev => prev.some(r => r.id === review.id) ? prev : [review, ...prev]);
     setNewIds(prev => new Set([...prev, review.id]));
     setTimeout(() => setNewIds(prev => { const s = new Set(prev); s.delete(review.id); return s; }), 5000);
-    setCafe(prev => {
-      if (!prev) return prev;
-      const cnt = prev.review_count + 1;
-      const total = (parseFloat(prev.avg_rating) || 0) * prev.review_count + review.stars;
-      return { ...prev, review_count: cnt, avg_rating: (total/cnt).toFixed(1) };
+    applyCafeStats(stats);
+  };
+
+  const handleReviewUpdated = (updatedReview, stats) => {
+    setReviews(prev => prev.map(r => r.id === updatedReview.id ? updatedReview : r));
+    applyCafeStats(stats);
+  };
+
+  const handleReviewDeleted = (reviewId, stats) => {
+    setReviews(prev => prev.filter(r => Number(r.id) !== Number(reviewId)));
+    setNewIds(prev => {
+      const next = new Set(prev);
+      next.delete(reviewId);
+      return next;
     });
+    applyCafeStats(stats);
   };
 
   // Loading skeleton
@@ -191,7 +210,14 @@ export default function CafeDetailPage({ socket, onNeedAuth }) {
         ) : (
           <div className="space-y-4 max-h-[600px] overflow-y-auto review-scroll pr-2">
             {reviews.map(r => (
-              <ReviewItem key={r.id} review={r} isNew={newIds.has(r.id)} />
+              <ReviewItem
+                key={r.id}
+                review={r}
+                cafeId={id}
+                isNew={newIds.has(r.id)}
+                onReviewUpdated={handleReviewUpdated}
+                onReviewDeleted={handleReviewDeleted}
+              />
             ))}
           </div>
         )}

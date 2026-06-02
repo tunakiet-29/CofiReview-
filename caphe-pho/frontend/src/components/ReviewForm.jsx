@@ -35,7 +35,7 @@ export default function ReviewForm({ cafeId, onReviewAdded, onNeedAuth }) {
     setLoading(true);
     try {
       const result = await reviewAPI.create(cafeId, { stars, content });
-      onReviewAdded(result.data);
+      onReviewAdded(result.data, result.stats);
       setStars(0);
       setContent('');
     } catch (err) {
