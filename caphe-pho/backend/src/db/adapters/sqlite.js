@@ -59,6 +59,7 @@ function _initTables() {
       tags        TEXT NOT NULL DEFAULT '[]',
       emoji       TEXT NOT NULL DEFAULT '☕',
       description TEXT,
+      image       TEXT DEFAULT NULL,
       created_at  TEXT DEFAULT (datetime('now','localtime'))
     );
     CREATE TABLE IF NOT EXISTS reviews (
@@ -70,7 +71,16 @@ function _initTables() {
       content    TEXT NOT NULL,
       created_at TEXT DEFAULT (datetime('now','localtime'))
     );
+    CREATE TABLE IF NOT EXISTS favorites (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      cafe_id    INTEGER NOT NULL REFERENCES cafes(id) ON DELETE CASCADE,
+      created_at TEXT DEFAULT (datetime('now','localtime')),
+      UNIQUE(user_id, cafe_id)
+    );
     CREATE INDEX IF NOT EXISTS idx_reviews_cafe ON reviews(cafe_id);
+    CREATE INDEX IF NOT EXISTS idx_favorites_user ON favorites(user_id);
+    CREATE INDEX IF NOT EXISTS idx_favorites_cafe ON favorites(cafe_id);
   `);
   _persist();
 }
@@ -86,8 +96,25 @@ function query(sql, params = []) {
 
 function execute(sql, params = []) {
   db.run(sql, params);
-  const [{ id }] = query('SELECT last_insert_rowid() as id');
-  return { lastInsertRowid: id };
+  _persist();
+
+  // Nếu là INSERT, trả về lastInsertRowid bằng cách lấy MAX(id)
+  const insertMatch = sql.match(/INSERT INTO\s+(\w+)/i);
+  if (insertMatch) {
+    const table = insertMatch[1];
+    const result = query(`SELECT MAX(id) as id FROM ${table}`);
+    if (!result || !result[0]) {
+      throw new Error('Không thể lấy ID của dòng vừa insert');
+    }
+    const id = Number(result[0].id);
+    if (isNaN(id) || id === 0) {
+      throw new Error(`ID không hợp lệ: ${result[0].id}`);
+    }
+    return { lastInsertRowid: id };
+  }
+
+  // Với UPDATE/DELETE/other, chỉ trả về object rỗng (caller không cần lastInsertRowid)
+  return {};
 }
 
 module.exports = { init };

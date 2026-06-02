@@ -9,10 +9,13 @@ const swaggerSpec    = require('./src/config/swagger');
 const authRoutes     = require('./src/routes/authRoutes');
 const cafeRoutes     = require('./src/routes/cafeRoutes');
 const reviewRoutes   = require('./src/routes/reviewRoutes');
+const favoriteRoutes = require('./src/routes/favoriteRoutes');
+const imageRoutes = require('./src/routes/imageRoutes');
 const errorHandler   = require('./src/middleware/errorHandler');
 const { getDB }      = require('./src/db/database');
 
 const app        = express();
+const path       = require('path');
 const httpServer = createServer(app);
 const PORT       = process.env.PORT || 3001;
 const ORIGIN     = process.env.FRONTEND_URL || 'http://localhost:5173';
@@ -31,6 +34,9 @@ app.set('io', io);
 app.use(cors({ origin: ORIGIN }));
 app.use(express.json());
 
+// Serve static assets (images, uploads, etc.) from /public
+app.use(express.static(path.join(__dirname, 'public')));
+
 // ── Swagger UI ──────────────────────────────────────────────
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customSiteTitle: '☕ Cà Phê Phố API Docs',
@@ -41,6 +47,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 app.use('/api/auth',  authRoutes);
 app.use('/api/cafes', cafeRoutes);
 app.use('/api/cafes/:id/reviews', reviewRoutes);
+app.use('/api/favorites', favoriteRoutes);
+app.use('/api/images', imageRoutes);
 app.get('/api/health', (_, res) => res.json({ status: 'ok', node: process.version }));
 
 app.use((req, res) => res.status(404).json({ error: `Không tìm thấy: ${req.method} ${req.path}` }));

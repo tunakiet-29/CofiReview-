@@ -1,4 +1,5 @@
 import { useCafes } from '../hooks/useCafes';
+import { useFavorites } from '../hooks/useFavorites';
 import CafeCard from '../components/CafeCard';
 import { WarningCircle, MagnifyingGlass, Storefront, Coffee, Brandy, Leaf } from '@phosphor-icons/react';
 
@@ -9,8 +10,9 @@ const TAGS = [
   { key: 'matcha', label: 'Matcha', icon: Leaf },
 ];
 
-export default function HomePage({ socket, connected }) {
+export default function HomePage({ socket, connected, onNeedAuth }) {
   const { cafes, loading, error, search, setSearch, activeTag, setActiveTag, reload } = useCafes(socket);
+  const { isFavorited, toggleFavorite } = useFavorites(onNeedAuth);
 
   return (
     <div className="overflow-x-hidden">
@@ -130,7 +132,14 @@ export default function HomePage({ socket, connected }) {
         {/* Cafe grid */}
         {!loading && !error && cafes.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {cafes.map(cafe => <CafeCard key={cafe.id} cafe={cafe} />)}
+            {cafes.map(cafe => (
+              <CafeCard
+                key={cafe.id}
+                cafe={cafe}
+                isFavorited={isFavorited(cafe.id)}
+                onToggleFavorite={() => toggleFavorite(cafe.id)}
+              />
+            ))}
           </div>
         )}
       </div>

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import StarRating from './StarRating';
 import { MapPin, Heart } from '@phosphor-icons/react';
 
-export default function CafeCard({ cafe }) {
+export default function CafeCard({ cafe, isFavorited = false, onToggleFavorite }) {
   const { id, name, address, tags, avg_rating, review_count } = cafe;
 
   return (
@@ -12,21 +12,27 @@ export default function CafeCard({ cafe }) {
                  hover:border-brown-light hover:shadow-md transition-all duration-300
                  hover:-translate-y-1 active:scale-[0.98] group relative flex flex-col">
                  
-      {/* Top Image (Placeholder using Picsum) */}
+      {/* Top Image */}
       <div className="w-full h-48 bg-tag-bg relative overflow-hidden">
         <img 
-          src={`https://picsum.photos/seed/${['coffeeshop','latte','cafe','espresso','cappuccino','barista'][id % 6]}-${id}/600/400`} 
+          src={(
+            cafe.image
+              ? (cafe.image.startsWith('/') ? cafe.image : `/api/images?url=${encodeURIComponent(cafe.image)}`)
+              : `https://picsum.photos/seed/coffee${id}/600/400`
+          )}
           alt={name} 
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           onError={e => { e.target.src = `https://picsum.photos/seed/coffee${id}/600/400`; }}
         />
-        {/* Favorite Button (Mock UI for US6) */}
+        {/* Favorite Button */}
         <button 
-          onClick={(e) => { e.preventDefault(); /* Mock Toggle Favorite */ }}
-          className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-brown-mid hover:text-accent hover:bg-white transition-colors z-10"
-          aria-label="Lưu quán"
+          type="button"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavorite?.(); }}
+          className={`absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors z-10
+            ${isFavorited ? 'text-accent shadow-md shadow-accent/20' : 'text-brown-mid hover:text-accent hover:bg-white'}`}
+          aria-label={isFavorited ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'}
         >
-          <Heart weight="bold" size={18} />
+          <Heart weight={isFavorited ? 'fill' : 'regular'} size={18} />
         </button>
       </div>
 

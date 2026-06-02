@@ -34,12 +34,15 @@ export default function ReviewForm({ cafeId, onReviewAdded, onNeedAuth }) {
 
     setLoading(true);
     try {
-      const result = await reviewAPI.create(cafeId, { stars, content });
+      const result = await reviewAPI.create(cafeId, { stars, content: content.trim() });
+      // result = { data: newReview, stats, message }
       onReviewAdded(result.data, result.stats);
       setStars(0);
       setContent('');
     } catch (err) {
-      setError(err.response?.data?.error || 'Gửi thất bại, thử lại nhé');
+      const errMsg = err.response?.data?.error || err.message || 'Gửi thất bại, thử lại nhé';
+      setError(errMsg);
+      console.error('Review submission error:', errMsg);
     } finally { setLoading(false); }
   };
 
