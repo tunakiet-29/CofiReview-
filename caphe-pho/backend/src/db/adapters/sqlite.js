@@ -59,6 +59,7 @@ function _initTables() {
       tags        TEXT NOT NULL DEFAULT '[]',
       emoji       TEXT NOT NULL DEFAULT '☕',
       description TEXT,
+      image_url   TEXT,
       created_at  TEXT DEFAULT (datetime('now','localtime'))
     );
     CREATE TABLE IF NOT EXISTS reviews (

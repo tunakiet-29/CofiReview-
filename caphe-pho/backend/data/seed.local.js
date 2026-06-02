@@ -15,7 +15,7 @@ async function seed() {
 
   db.run(`
     CREATE TABLE users   (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now','localtime')));
-    CREATE TABLE cafes   (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, address TEXT NOT NULL, tags TEXT NOT NULL DEFAULT '[]', emoji TEXT NOT NULL DEFAULT '☕', description TEXT, created_at TEXT DEFAULT (datetime('now','localtime')));
+    CREATE TABLE cafes   (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, address TEXT NOT NULL, tags TEXT NOT NULL DEFAULT '[]', emoji TEXT NOT NULL DEFAULT '☕', description TEXT, image_url TEXT, created_at TEXT DEFAULT (datetime('now','localtime')));
     CREATE TABLE reviews (id INTEGER PRIMARY KEY AUTOINCREMENT, cafe_id INTEGER NOT NULL REFERENCES cafes(id) ON DELETE CASCADE, user_id INTEGER REFERENCES users(id) ON DELETE SET NULL, reviewer TEXT NOT NULL, stars INTEGER NOT NULL, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now','localtime')));
     CREATE INDEX idx_reviews_cafe ON reviews(cafe_id);
   `);
@@ -25,13 +25,13 @@ async function seed() {
     .forEach(([n,e]) => db.run('INSERT INTO users (name,email,password) VALUES (?,?,?)',[n,e,hash]));
 
   [
-    ['The Workshop Coffee','27 Ngô Đức Kế, Q.1, TP.HCM','["cà phê","specialty"]','☕','Không gian tối giản, single origin rang nhẹ.'],
-    ['Phúc Long Heritage','35 Bùi Thị Xuân, Đà Lạt','["trà sữa","cà phê"]','🧋','Thương hiệu lâu đời với trà Đà Lạt chính hãng.'],
-    ['Matcha Nami','18 Hoàng Hoa Thám, Hà Nội','["matcha","trà sữa"]','🍵','Chuyên matcha Nhật nhập khẩu, từ latte đến bánh handmade.'],
-    ['Cà Phê Trung Nguyên Legend','52 Hai Bà Trưng, Huế','["cà phê"]','🫖','Di sản cà phê Việt, không gian truyền thống Huế.'],
-    ['Gong Cha','12 Lê Lợi, TP.HCM','["trà sữa"]','🧉','Trà sữa Đài Loan, topping đa dạng.'],
-    ['Somewhere Coffee','14 Trần Hưng Đạo, Đà Nẵng','["cà phê","specialty"]','☕','Roastery tự rang, view biển Đà Nẵng.'],
-  ].forEach(([n,a,t,e,d]) => db.run('INSERT INTO cafes (name,address,tags,emoji,description) VALUES (?,?,?,?,?)',[n,a,t,e,d]));
+    ['The Workshop Coffee','27 Ngô Đức Kế, Q.1, TP.HCM','["cà phê","specialty"]','☕','Không gian tối giản, single origin rang nhẹ.','https://images.unsplash.com/photo-1559056199-641a0ac8b3f7?w=600&h=400&fit=crop'],
+    ['Phúc Long Heritage','35 Bùi Thị Xuân, Đà Lạt','["trà sữa","cà phê"]','🧋','Thương hiệu lâu đời với trà Đà Lạt chính hãng.','https://images.unsplash.com/photo-1599599810694-b5ac4dd11b71?w=600&h=400&fit=crop'],
+    ['Matcha Nami','18 Hoàng Hoa Thám, Hà Nội','["matcha","trà sữa"]','🍵','Chuyên matcha Nhật nhập khẩu, từ latte đến bánh handmade.','https://images.unsplash.com/photo-1585518419759-199310f9e76e?w=600&h=400&fit=crop'],
+    ['Cà Phê Trung Nguyên Legend','52 Hai Bà Trưng, Huế','["cà phê"]','🫖','Di sản cà phê Việt, không gian truyền thống Huế.','https://images.unsplash.com/photo-1507133750040-4a8ff57cf585?w=600&h=400&fit=crop'],
+    ['Gong Cha','12 Lê Lợi, TP.HCM','["trà sữa"]','🧉','Trà sữa Đài Loan, topping đa dạng.','https://images.unsplash.com/photo-1600158352506-f27b2e3fa05d?w=600&h=400&fit=crop'],
+    ['Somewhere Coffee','14 Trần Hưng Đạo, Đà Nẵng','["cà phê","specialty"]','☕','Roastery tự rang, view biển Đà Nẵng.','https://images.unsplash.com/photo-1612528443702-f6741f271a04?w=600&h=400&fit=crop'],
+  ].forEach(([n,a,t,e,d,img]) => db.run('INSERT INTO cafes (name,address,tags,emoji,description,image_url) VALUES (?,?,?,?,?,?)',[n,a,t,e,d,img]));
 
   [
     [1,1,'Minh Trí',5,'Flat white mịn và thơm. Không gian yên tĩnh phù hợp làm việc.'],

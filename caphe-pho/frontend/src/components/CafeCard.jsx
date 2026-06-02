@@ -4,7 +4,7 @@ import StarRating from './StarRating';
 import { MapPin, Heart } from '@phosphor-icons/react';
 
 export default function CafeCard({ cafe }) {
-  const { id, name, address, tags, avg_rating, review_count } = cafe;
+  const { id, name, address, tags, avg_rating, review_count, image_url } = cafe;
 
   return (
     <Link to={`/cafes/${id}`}
@@ -12,17 +12,19 @@ export default function CafeCard({ cafe }) {
                  hover:border-brown-light hover:shadow-md transition-all duration-300
                  hover:-translate-y-1 active:scale-[0.98] group relative flex flex-col">
                  
-      {/* Top Image (Placeholder using Picsum) */}
+      {/* Top Image */}
       <div className="w-full h-48 bg-tag-bg relative overflow-hidden">
-        <img 
-          src={`https://picsum.photos/seed/${['coffeeshop','latte','cafe','espresso','cappuccino','barista'][id % 6]}-${id}/600/400`} 
-          alt={name} 
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          onError={e => { e.target.src = `https://picsum.photos/seed/coffee${id}/600/400`; }}
-        />
-        {/* Favorite Button (Mock UI for US6) */}
+        {image_url && (
+          <img 
+            src={image_url} 
+            alt={name} 
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            onError={e => { e.target.style.display = 'none'; }}
+          />
+        )}
+        {/* Favorite Button */}
         <button 
-          onClick={(e) => { e.preventDefault(); /* Mock Toggle Favorite */ }}
+          onClick={(e) => { e.preventDefault(); }}
           className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-brown-mid hover:text-accent hover:bg-white transition-colors z-10"
           aria-label="Lưu quán"
         >
