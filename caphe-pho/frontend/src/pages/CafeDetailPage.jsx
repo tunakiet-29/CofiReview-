@@ -154,8 +154,8 @@ export default function CafeDetailPage({ socket, onNeedAuth }) {
         <div className="w-full h-64 sm:h-80 relative bg-tag-bg">
           <img 
             src={(
-              cafe.image
-                ? (cafe.image.startsWith('/') ? cafe.image : `/api/images?url=${encodeURIComponent(cafe.image)}`)
+              (cafe.image || cafe.image_url)
+                ? ((cafe.image || cafe.image_url).startsWith('/') ? (cafe.image || cafe.image_url) : `/api/images?url=${encodeURIComponent(cafe.image || cafe.image_url)}`)
                 : `https://picsum.photos/seed/cafe-${cafe.id}/1200/600`
             )}
             alt={cafe.name} 

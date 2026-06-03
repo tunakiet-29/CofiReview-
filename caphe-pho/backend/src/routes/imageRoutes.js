@@ -7,7 +7,13 @@ const ALLOW_HOSTS = new Set([
   'images.unsplash.com',
   'i.imgur.com',
   'encrypted-tbn0.gstatic.com',
-  'picsum.photos'
+  'picsum.photos',
+  'down-vn.img.susercontent.com',
+  'cdn2.tuoitre.vn',
+  'www.justonecookbook.com',
+  'i.ytimg.com',
+  'inkythuatso.com',
+  'somewherecoffee.ca',
 ]);
 
 router.get('/', async (req, res, next) => {

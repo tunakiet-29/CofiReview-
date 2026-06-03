@@ -16,8 +16,8 @@ export default function CafeCard({ cafe, isFavorited = false, onToggleFavorite }
       <div className="w-full h-48 bg-tag-bg relative overflow-hidden">
         <img 
           src={(
-            cafe.image
-              ? (cafe.image.startsWith('/') ? cafe.image : `/api/images?url=${encodeURIComponent(cafe.image)}`)
+            (cafe.image || cafe.image_url)
+              ? ((cafe.image || cafe.image_url).startsWith('/') ? (cafe.image || cafe.image_url) : `/api/images?url=${encodeURIComponent(cafe.image || cafe.image_url)}`)
               : `https://picsum.photos/seed/coffee${id}/600/400`
           )}
           alt={name} 

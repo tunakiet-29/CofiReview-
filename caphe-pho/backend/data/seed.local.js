@@ -1,4 +1,4 @@
-// data/seed.local.js — seed cho SQLite local (không cần Postgres)
+﻿// data/seed.local.js — seed cho SQLite local (không cần Postgres)
 require('dotenv').config();
 const initSqlJs = require('sql.js');
 const path  = require('path');
@@ -15,7 +15,7 @@ async function seed() {
 
   db.run(`
     CREATE TABLE users   (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now','localtime')));
-    CREATE TABLE cafes   (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, address TEXT NOT NULL, tags TEXT NOT NULL DEFAULT '[]', emoji TEXT NOT NULL DEFAULT '☕', description TEXT, image TEXT DEFAULT NULL, created_at TEXT DEFAULT (datetime('now','localtime')));
+    CREATE TABLE cafes   (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, address TEXT NOT NULL, tags TEXT NOT NULL DEFAULT '[]', emoji TEXT NOT NULL DEFAULT '☕', description TEXT, image_url TEXT DEFAULT NULL, image TEXT DEFAULT NULL, created_at TEXT DEFAULT (datetime('now','localtime')));
     CREATE TABLE reviews (id INTEGER PRIMARY KEY AUTOINCREMENT, cafe_id INTEGER NOT NULL REFERENCES cafes(id) ON DELETE CASCADE, user_id INTEGER REFERENCES users(id) ON DELETE SET NULL, reviewer TEXT NOT NULL, stars INTEGER NOT NULL, content TEXT NOT NULL, created_at TEXT DEFAULT (datetime('now','localtime')));
     CREATE TABLE favorites (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, cafe_id INTEGER NOT NULL REFERENCES cafes(id) ON DELETE CASCADE, created_at TEXT DEFAULT (datetime('now','localtime')), UNIQUE(user_id,cafe_id));
     CREATE INDEX idx_reviews_cafe ON reviews(cafe_id);
@@ -26,13 +26,13 @@ async function seed() {
     .forEach(([n,e]) => db.run('INSERT INTO users (name,email,password) VALUES (?,?,?)',[n,e,hash]));
 
   [
-    ['The Workshop Coffee','27 Ngô Đức Kế, Q.1, TP.HCM','["cà phê","specialty"]','☕','Không gian tối giản, single origin rang nhẹ.','/images/cafe-1.svg'],
-    ['Phúc Long Heritage','35 Bùi Thị Xuân, Đà Lạt','["trà sữa","cà phê"]','🧋','Thương hiệu lâu đời với trà Đà Lạt chính hãng.','/images/cafe-2.svg'],
-    ['Matcha Nami','18 Hoàng Hoa Thám, Hà Nội','["matcha","trà sữa"]','🍵','Chuyên matcha Nhật nhập khẩu, từ latte đến bánh handmade.','/images/cafe-3.svg'],
-    ['Cà Phê Trung Nguyên Legend','52 Hai Bà Trưng, Huế','["cà phê"]','🫖','Di sản cà phê Việt, không gian truyền thống Huế.','/images/cafe-4.svg'],
-    ['Gong Cha','12 Lê Lợi, TP.HCM','["trà sữa"]','🧉','Trà sữa Đài Loan, topping đa dạng.','/images/cafe-5.svg'],
-    ['Somewhere Coffee','14 Trần Hưng Đạo, Đà Nẵng','["cà phê","specialty"]','☕','Roastery tự rang, view biển Đà Nẵng.','/images/cafe-6.svg'],
-  ].forEach(([n,a,t,e,d,img]) => db.run('INSERT INTO cafes (name,address,tags,emoji,description,image) VALUES (?,?,?,?,?,?)',[n,a,t,e,d,img]));
+    ['The Workshop Coffee','27 Ngô Đức Kế, Q.1, TP.HCM','["cà phê","specialty"]','☕','Không gian tối giản, single origin rang nhẹ.','https://down-vn.img.susercontent.com/vn-11134259-7r98o-lw9xlnry0wk9fa@resize_w800'],
+    ['Phúc Long Heritage','35 Bùi Thị Xuân, Đà Lạt','["trà sữa","cà phê"]','🧋','Thương hiệu lâu đời với trà Đà Lạt chính hãng.','https://cdn2.tuoitre.vn/471584752817336320/2025/8/14/-viet-nam-nhung-duong-net-bo-tron-mem-mai-phoi-hop-cung-hinh-khoi-toi-gian-giup-hinh-anh-thuong-hieu-mang-den-cam-giac-truyen-thong-ma-hien-da-17551804654751779234622.jpg'],
+    ['Matcha Nami','18 Hoàng Hoa Thám, Hà Nội','["matcha","trà sữa"]','🍵','Chuyên matcha Nhật nhập khẩu, từ latte đến bánh handmade.','https://www.justonecookbook.com/wp-content/uploads/2025/12/Matcha-Latte-4598-I-2.jpg'],
+    ['Cà Phê Trung Nguyên Legend','52 Hai Bà Trưng, Huế','["cà phê"]','🫖','Di sản cà phê Việt, không gian truyền thống Huế.','https://i.ytimg.com/vi/o5dzsBdFEp0/maxresdefault.jpg'],
+    ['Gong Cha','12 Lê Lợi, TP.HCM','["trà sữa"]','🧉','Trà sữa Đài Loan, topping đa dạng.','https://inkythuatso.com/uploads/images/2021/12/logo-gong-cha-inkythuatso-01-14-14-49-58.jpg'],
+    ['Somewhere Coffee','14 Trần Hưng Đạo, Đà Nẵng','["cà phê","specialty"]','☕','Roastery tự rang, view biển Đà Nẵng.','https://somewherecoffee.ca/cdn/shop/files/COFFEE_2033e0de-013d-41b9-830f-53703fd6a977.png?v=1767508412'],
+  ].forEach(([n,a,t,e,d,u]) => db.run('INSERT INTO cafes (name,address,tags,emoji,description,image_url) VALUES (?,?,?,?,?,?)',[n,a,t,e,d,u]));
 
   [
     [1,1,'Minh Trí',5,'Flat white mịn và thơm. Không gian yên tĩnh phù hợp làm việc.'],
@@ -47,10 +47,6 @@ async function seed() {
     [6,null,'Ngọc Mai',5,'View biển cực đẹp, cà phê ngon. Cortado best!'],
     [6,null,'Tuấn Kiệt',4,'Cà phê ngon, không gian rộng.'],
   ].forEach(([c,u,r,s,t]) => db.run('INSERT INTO reviews (cafe_id,user_id,reviewer,stars,content) VALUES (?,?,?,?,?)',[c,u??null,r,s,t]));
-
-  // Sample favorite data
-  [[1,1],[3,1],[5,2]].forEach(([cafeId,userId]) =>
-    db.run('INSERT INTO favorites (user_id, cafe_id) VALUES (?,?)', [userId, cafeId]));
 
   fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
   fs.writeFileSync(DB_PATH, Buffer.from(db.export()));
