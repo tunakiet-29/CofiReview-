@@ -4,10 +4,11 @@ import { Routes, Route, Link } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useAuth } from './context/AuthContext';
 import HomePage from './pages/HomePage';
+import FavoritesPage from './pages/FavoritesPage';
 import CafeDetailPage from './pages/CafeDetailPage';
 import AuthModal from './components/AuthModal';
 import Toast from './components/Toast';
-import { Coffee, SignIn, SignOut } from '@phosphor-icons/react';
+import { Coffee, SignIn, SignOut, Heart } from '@phosphor-icons/react';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
@@ -20,15 +21,19 @@ function Header({ onOpenAuth, connected }) {
         <Link to="/" className="flex items-center gap-2.5 group">
           <Coffee weight="fill" size={26} className="text-accent group-hover:text-brown-light transition-colors" />
           <span className="font-display text-xl font-bold text-cream tracking-tight">
-            Cà Phê <span className="text-accent">Phố</span>
+            CofiReview
           </span>
         </Link>
 
         {/* Right actions */}
         <div className="flex items-center gap-3">
-
           {user ? (
             <div className="flex items-center gap-3">
+              <Link to="/favorites"
+                className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 text-cream/80 hover:border-white/50 hover:text-white transition-all">
+                <Heart size={16} />
+                Yêu thích
+              </Link>
               <span className="text-cream/70 text-sm hidden sm:block">
                 Xin chào, <span className="text-cream font-semibold">{user.name}</span>
               </span>
@@ -88,7 +93,8 @@ export default function App() {
 
       <main className="flex-1">
         <Routes>
-          <Route path="/" element={<HomePage socket={socket} connected={connected} />} />
+          <Route path="/" element={<HomePage socket={socket} connected={connected} onNeedAuth={() => setShowAuth(true)} />} />
+          <Route path="/favorites" element={<FavoritesPage onNeedAuth={() => setShowAuth(true)} />} />
           <Route path="/cafes/:id" element={
             <CafeDetailPage socket={socket} onNeedAuth={() => setShowAuth(true)} />
           } />
@@ -106,7 +112,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-center">
           <div className="flex items-center gap-2">
             <Coffee weight="fill" size={18} className="text-accent" />
-            <span className="font-display font-bold text-sm text-brown-dark">Cà Phê Phố</span>
+            <span className="font-display font-bold text-sm text-brown-dark">CofiReview</span>
           </div>
         </div>
       </footer>

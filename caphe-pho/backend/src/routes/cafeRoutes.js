@@ -1,6 +1,7 @@
 // src/routes/cafeRoutes.js
 const express = require('express');
 const router  = express.Router();
+const { optionalAuth } = require('../middleware/auth');
 const { getCafes, getCafeById } = require('../controllers/cafeController');
 
 /**
@@ -39,7 +40,7 @@ const { getCafes, getCafeById } = require('../controllers/cafeController');
  *                   items: { $ref: '#/components/schemas/Cafe' }
  *                 cached: { type: boolean }
  */
-router.get('/',    getCafes);
+router.get('/',    optionalAuth, getCafes);
 
 /**
  * @swagger
@@ -62,6 +63,6 @@ router.get('/',    getCafes);
  *       404:
  *         description: Không tìm thấy quán
  */
-router.get('/:id', getCafeById);
+router.get('/:id', optionalAuth, getCafeById);
 
 module.exports = router;

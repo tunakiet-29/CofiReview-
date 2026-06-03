@@ -53,7 +53,16 @@ async function _initTables() {
       content    TEXT NOT NULL,
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
+    CREATE TABLE IF NOT EXISTS favorites (
+      id         SERIAL PRIMARY KEY,
+      user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      cafe_id    INTEGER NOT NULL REFERENCES cafes(id) ON DELETE CASCADE,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(user_id, cafe_id)
+    );
     CREATE INDEX IF NOT EXISTS idx_reviews_cafe ON reviews(cafe_id);
+    CREATE INDEX IF NOT EXISTS idx_favorites_user ON favorites(user_id);
+    CREATE INDEX IF NOT EXISTS idx_favorites_cafe ON favorites(cafe_id);
   `);
 }
 
@@ -73,7 +82,10 @@ async function execute(sql, params = []) {
   // Lấy id của row vừa insert
   const insertSql = pgSql.replace(/;?\s*$/, ' RETURNING id');
   const { rows } = await pool.query(insertSql, params);
-  return { lastInsertRowid: rows[0]?.id };
+  if (!rows || !rows[0]) {
+    throw new Error('Không thể lấy ID của dòng vừa insert');
+  }
+  return { lastInsertRowid: rows[0].id };
 }
 
 module.exports = { init };

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { cafeAPI, reviewAPI } from '../services/api';
+import { useFavorites } from '../hooks/useFavorites';
 import StarRating from '../components/StarRating';
 import ReviewItem from '../components/ReviewItem';
 import ReviewForm from '../components/ReviewForm';
@@ -8,6 +9,7 @@ import { ArrowLeft, MapPin, WarningCircle, MagnifyingGlass, Heart, ChatCircleTex
 
 export default function CafeDetailPage({ socket, onNeedAuth }) {
   const { id } = useParams();
+  const { isFavorited, toggleFavorite } = useFavorites(onNeedAuth);
   const [cafe, setCafe]       = useState(null);
   const [reviews, setReviews] = useState([]);
   const [newIds, setNewIds]   = useState(new Set());
@@ -60,6 +62,10 @@ export default function CafeDetailPage({ socket, onNeedAuth }) {
   };
 
   const handleReviewAdded = (review, stats) => {
+    if (!review || !review.id) {
+      console.error('Invalid review data:', review);
+      return;
+    }
     setReviews(prev => prev.some(r => r.id === review.id) ? prev : [review, ...prev]);
     setNewIds(prev => new Set([...prev, review.id]));
     setTimeout(() => setNewIds(prev => { const s = new Set(prev); s.delete(review.id); return s; }), 5000);
@@ -147,7 +153,13 @@ export default function CafeDetailPage({ socket, onNeedAuth }) {
       <div className="bg-card-bg border border-border rounded-2xl overflow-hidden mb-8 shadow-sm">
         <div className="w-full h-64 sm:h-80 relative bg-tag-bg">
           <img 
-            src={`https://picsum.photos/seed/cafe-${cafe.id}/1200/600`} 
+            src={(
+              (cafe.image || cafe.image_url)
+                ? ((cafe.image || cafe.image_url).startsWith('/')
+                    ? (cafe.image || cafe.image_url)
+                    : `/api/images?url=${encodeURIComponent(cafe.image || cafe.image_url)}`)
+                : `https://picsum.photos/seed/cafe-${cafe.id}/1200/600`
+            )}
             alt={cafe.name} 
             className="w-full h-full object-cover"
           />
@@ -161,11 +173,13 @@ export default function CafeDetailPage({ socket, onNeedAuth }) {
             </div>
             {/* US6: Bookmark */}
             <button 
-              onClick={() => { /* Mock Toggle Favorite */ }}
-              className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-accent hover:border-accent border border-white/30 transition-all active:scale-[0.98]"
-              aria-label="Lưu quán"
+              type="button"
+              onClick={() => toggleFavorite(id)}
+              className={`w-10 h-10 backdrop-blur-md rounded-full flex items-center justify-center transition-all active:scale-[0.98] border border-white/30
+                ${isFavorited(id) ? 'bg-accent text-white hover:bg-accent/90' : 'bg-white/20 text-white hover:bg-white hover:text-brown-dark'}`}
+              aria-label={isFavorited(id) ? 'Bỏ yêu thích' : 'Lưu quán'}
             >
-              <Heart weight="bold" size={20} />
+              <Heart weight={isFavorited(id) ? 'fill' : 'regular'} size={20} />
             </button>
           </div>
         </div>

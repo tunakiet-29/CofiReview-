@@ -85,7 +85,24 @@ async function createReview(req, res) {
     [req.params.id, req.user.id, req.user.name, stars, content]
   );
 
-  const newReview = query('SELECT * FROM reviews WHERE id = ?', [lastInsertRowid])[0];
+  console.log('✅ Review inserted:', { lastInsertRowid, cafeId: req.params.id, userId: req.user.id });
+
+  // Lấy review vừa tạo với đầy đủ thông tin
+  const newReviewRows = query(
+    `SELECT r.*, u.name AS user_display_name
+     FROM reviews r LEFT JOIN users u ON r.user_id = u.id
+     WHERE r.id = ?`,
+    [lastInsertRowid]
+  );
+
+  console.log('🔍 Query result:', { lastInsertRowid, rowsFound: newReviewRows.length, data: newReviewRows });
+  
+  if (!newReviewRows || newReviewRows.length === 0) {
+    console.error('❌ Không tìm thấy review:', { lastInsertRowid, cafeId: req.params.id, userId: req.user.id });
+    return res.status(500).json({ error: 'Không thể lấy dữ liệu review vừa tạo' });
+  }
+  
+  const newReview = newReviewRows[0];
 
   await invalidateCafeCache();
 
@@ -121,7 +138,12 @@ async function updateReview(req, res) {
     [stars, content, reviewId]
   );
 
-  const updatedReview = query('SELECT * FROM reviews WHERE id = ?', [reviewId])[0];
+  const updatedReview = query(
+    `SELECT r.*, u.name AS user_display_name
+     FROM reviews r LEFT JOIN users u ON r.user_id = u.id
+     WHERE r.id = ?`,
+    [reviewId]
+  )[0];
   await invalidateCafeCache();
 
   const stats = getCafeStats(cafeId);

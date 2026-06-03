@@ -3,8 +3,16 @@ import { Link } from 'react-router-dom';
 import StarRating from './StarRating';
 import { MapPin, Heart } from '@phosphor-icons/react';
 
-export default function CafeCard({ cafe }) {
-  const { id, name, address, tags, avg_rating, review_count, image_url } = cafe;
+export default function CafeCard({ cafe, isFavorited = false, onToggleFavorite }) {
+  const { id, name, address, tags, avg_rating, review_count, image, image_url } = cafe;
+  const imageSource = image || image_url;
+  const imageSrc = imageSource
+    ? imageSource.startsWith('/')
+      ? imageSource
+      : imageSource.startsWith('http')
+        ? `/api/images?url=${encodeURIComponent(imageSource)}`
+        : imageSource
+    : `https://picsum.photos/seed/coffee${id}/600/400`;
 
   return (
     <Link to={`/cafes/${id}`}
@@ -14,21 +22,21 @@ export default function CafeCard({ cafe }) {
                  
       {/* Top Image */}
       <div className="w-full h-48 bg-tag-bg relative overflow-hidden">
-        {image_url && (
-          <img 
-            src={image_url} 
-            alt={name} 
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            onError={e => { e.target.style.display = 'none'; }}
-          />
-        )}
+        <img 
+          src={imageSrc}
+          alt={name}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          onError={e => { e.target.src = `https://picsum.photos/seed/coffee${id}/600/400`; }}
+        />
         {/* Favorite Button */}
         <button 
-          onClick={(e) => { e.preventDefault(); }}
-          className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-brown-mid hover:text-accent hover:bg-white transition-colors z-10"
-          aria-label="Lưu quán"
+          type="button"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavorite?.(); }}
+          className={`absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors z-10
+            ${isFavorited ? 'text-accent shadow-md shadow-accent/20' : 'text-brown-mid hover:text-accent hover:bg-white'}`}
+          aria-label={isFavorited ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'}
         >
-          <Heart weight="bold" size={18} />
+          <Heart weight={isFavorited ? 'fill' : 'regular'} size={18} />
         </button>
       </div>
 

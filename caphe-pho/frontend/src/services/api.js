@@ -38,7 +38,12 @@ export const cafeAPI = {
   list:   (params = {}) => api.get('/cafes', { params }).then(r => r.data.data),
   getById:(id)          => api.get(`/cafes/${id}`).then(r => r.data.data),
 };
-
+// ── Favorites ─────────────────────────────────────────────────
+export const favoriteAPI = {
+  list:   ()            => api.get('/favorites').then(r => r.data.data),
+  add:    (cafeId)      => api.post(`/favorites/${cafeId}`).then(r => r.data),
+  remove: (cafeId)      => api.delete(`/favorites/${cafeId}`).then(r => r.data),
+};
 // ── Reviews ─────────────────────────────────────────────────
 export const reviewAPI = {
   list:   (cafeId)                 => api.get(`/cafes/${cafeId}/reviews`).then(r => r.data.data),

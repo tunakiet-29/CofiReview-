@@ -31,6 +31,13 @@ async function seed() {
       reviewer TEXT NOT NULL, stars INTEGER NOT NULL, content TEXT NOT NULL,
       created_at TEXT DEFAULT (datetime('now','localtime'))
     );
+    CREATE TABLE favorites (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      cafe_id INTEGER NOT NULL REFERENCES cafes(id) ON DELETE CASCADE,
+      created_at TEXT DEFAULT (datetime('now','localtime')),
+      UNIQUE(user_id, cafe_id)
+    );
     CREATE INDEX idx_reviews_cafe ON reviews(cafe_id);
   `);
 
@@ -73,6 +80,10 @@ async function seed() {
   reviews.forEach(([cafe_id,user_id,reviewer,stars,content]) =>
     db.run('INSERT INTO reviews (cafe_id,user_id,reviewer,stars,content) VALUES (?,?,?,?,?)',
       [cafe_id, user_id ?? null, reviewer, stars, content]));
+
+  // Sample favorite data
+  [[1,1],[3,1],[5,2]].forEach(([cafeId,userId]) =>
+    db.run('INSERT INTO favorites (user_id,cafe_id) VALUES (?,?)', [userId, cafeId]));
 
   const data = db.export();
   fs.writeFileSync(DB_PATH, Buffer.from(data));
